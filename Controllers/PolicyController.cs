@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+﻿using InsuranceConsultingOffice.Application.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 
 namespace InsuranceConsultingOffice.Controllers
 {
@@ -8,6 +7,15 @@ namespace InsuranceConsultingOffice.Controllers
     [ApiController]
     public class PolicyController : ControllerBase
     {
+
+        private readonly IPolicyApplication _policyApplication;
+
+        public PolicyController(IPolicyApplication policyApplication)
+        {
+            _policyApplication = policyApplication; 
+        }
+
+
         // GET: api/<PolicyController>
         [HttpGet]
         public IEnumerable<string> Get()
@@ -16,10 +24,12 @@ namespace InsuranceConsultingOffice.Controllers
         }
 
         // GET api/<PolicyController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        [HttpPost("{code}")]
+        public /*async*/ IActionResult GetByCode([FromRoute] string code)
         {
-            return "value";
+            var response = /*await*/ _policyApplication.GetPoliciesByCode(code);
+
+            return Ok(response);
         }
 
         // POST api/<PolicyController>
