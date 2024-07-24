@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace InsuranceConsultingOffice.Domain.Entities;
+﻿namespace InsuranceConsultingOffice.Domain.Entities;
 
 public partial class Insured
 {
@@ -15,9 +12,6 @@ public partial class Insured
 
     public int Age { get; set; }
 
-    public int? PolicyId { get; set; }
-
+    //[JsonIgnore]
     public virtual ICollection<Assignment> Assignments { get; set; } = new List<Assignment>();
-
-    public virtual Policy? Policy { get; set; }
 }

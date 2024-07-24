@@ -12,7 +12,6 @@ public partial class Policy
 
     public decimal Premium { get; set; }
 
+    //[JsonIgnore]
     public virtual ICollection<Assignment> Assignments { get; set; } = new List<Assignment>();
-
-    public virtual ICollection<Insured> Insureds { get; set; } = new List<Insured>();
 }

@@ -41,10 +41,6 @@ public partial class InsuranceDbContext : DbContext
             entity.Property(e => e.IdCard).HasMaxLength(50);
             entity.Property(e => e.Name).HasMaxLength(100);
             entity.Property(e => e.Phone).HasMaxLength(20);
-
-            entity.HasOne(d => d.Policy).WithMany(p => p.Insureds)
-                .HasForeignKey(d => d.PolicyId)
-                .HasConstraintName("FK__Insureds__Policy__3A81B327");
         });
 
         modelBuilder.Entity<Policy>(entity =>

@@ -10,6 +10,7 @@ namespace InsuranceConsultingOffice.Application.Mappers
         public PolicyMapingsProfile() 
         {
             CreateMap<Policy, PolicyResponseDto>().ReverseMap();
+            CreateMap<Policy, PolicyRequestDto>().ReverseMap();
         }
     }
 }

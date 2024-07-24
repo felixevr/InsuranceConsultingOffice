@@ -1,4 +1,5 @@
-﻿using InsuranceConsultingOffice.Application.Interfaces;
+﻿using InsuranceConsultingOffice.Application.Dtos.Request;
+using InsuranceConsultingOffice.Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InsuranceConsultingOffice.Controllers
@@ -16,15 +17,8 @@ namespace InsuranceConsultingOffice.Controllers
         }
 
 
-        // GET: api/<PolicyController>
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
 
-        // GET api/<PolicyController>/5
-        [HttpPost("{code}")]
+        [HttpGet("{code}")]
         public /*async*/ IActionResult GetByCode([FromRoute] string code)
         {
             var response = /*await*/ _policyApplication.GetPoliciesByCode(code);
@@ -32,22 +26,34 @@ namespace InsuranceConsultingOffice.Controllers
             return Ok(response);
         }
 
-        // POST api/<PolicyController>
-        [HttpPost]
-        public void Post([FromBody] string value)
+
+ 
+        [HttpPost("Register")]
+        public IActionResult Post([FromBody] PolicyRequestDto requestDto)
         {
+            var response = _policyApplication.RegisterPolicy(requestDto);
+
+            return Ok(response);
         }
 
-        // PUT api/<PolicyController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+
+
+        [HttpPut("Edit{id}")]
+        public IActionResult Put(int id, [FromBody] PolicyRequestDto requestDto)
         {
+            var response = _policyApplication.EditPolicy(id, requestDto);
+
+            return Ok(response);
         }
 
-        // DELETE api/<PolicyController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+
+
+        [HttpDelete("Delete{id}")]
+        public IActionResult Delete(int id)
         {
+            var response = _policyApplication.RemovePolicy(id);
+
+            return Ok(response);
         }
     }
 }
