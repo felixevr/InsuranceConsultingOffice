@@ -22,11 +22,13 @@ namespace InsuranceConsultingOffice.Application.Services
         }
 
 
+
         public BaseResponse<IEnumerable<PolicyResponseDto>> GetPoliciesByCode(string code)
         {
             var response = new BaseResponse<IEnumerable<PolicyResponseDto>>();
-            var policies = new PolicyRepository();
-            var results = policies.GetPoliciesByCode(_context, code);
+            var repository = new PolicyRepository();
+
+            IEnumerable<Policy> results = repository.GetPoliciesByCode(_context, code);
 
             if (results.Count() > 0)
             {
@@ -44,64 +46,30 @@ namespace InsuranceConsultingOffice.Application.Services
 
         }
 
+
+
         public BaseResponse<bool> RegisterPolicy(PolicyRequestDto requestDto)
         {
             var response = new BaseResponse<bool>();
-            var validation = GetPoliciesByCode(requestDto.Code);
 
-            if (validation.Data.Count() > 0)
+            var codeValidation = GetPoliciesByCode(requestDto.Code!);
+
+            if (codeValidation.Data is not null)
             {
                 response.IsSuccess = false;
-                response.Message = ReplyMessage.MESSAGE_ALREADY_EXIST;
+                response.Message = ReplyMessage.MESSAGE_INSURANCE_ALREADY_EXIST;
             
                 return response;
             }
 
-            var policy = _mapper.Map<Policy>(requestDto);
+            Policy policy = _mapper.Map<Policy>(requestDto);
             _context.Add(policy);
             var recordsAffected = _context.SaveChanges();
-
-            if (recordsAffected >0 )
-            {
-                response.IsSuccess = true;
-                response.Message = ReplyMessage.MESSAGE_SUCCESS_TO_REGISTER;
-                response.Data = recordsAffected > 0 ;
-            }
-            else
-            {
-                response.IsSuccess = false;
-                response.Message = ReplyMessage.MESSAGE_ERROR_TO_SAVE_IN_DB;
-            }
-            return response;
-        }
-
-
-        public BaseResponse<bool> EditPolicy(int id, PolicyRequestDto requestDto) 
-        {
-            var response = new BaseResponse<bool>();
-            var policy = new PolicyRepository();
-
-            var policyById = policy.GetPolicyById(_context, id);
-
-            if (policyById is null)
-            {
-                response.IsSuccess = false;
-                response.Message = ReplyMessage.MESSAGE_CODE_DOES_NOT_EXIST;
-
-                return response;
-            }
-
-            var policyNew = _mapper.Map<Policy>(requestDto);
-            policyNew.PolicyId = id;
-
-            _context.Update(policyNew);
-            var recordsAffected = _context.SaveChanges();
-
 
             if (recordsAffected > 0)
             {
                 response.IsSuccess = true;
-                response.Message = ReplyMessage.MESSAGE_SUCCESS;
+                response.Message = ReplyMessage.MESSAGE_SUCCESS_TO_REGISTER;
                 response.Data = recordsAffected > 0;
             }
             else
@@ -112,14 +80,69 @@ namespace InsuranceConsultingOffice.Application.Services
             return response;
         }
 
+
+
+        public BaseResponse<bool> EditPolicy(int id, PolicyRequestDto requestDto) 
+        {
+            var response = new BaseResponse<bool>();
+            var repository = new PolicyRepository();
+
+            IEnumerable<Policy> policies = repository.GetPoliciesByCode(_context, requestDto.Code!);  // ESTO AGREGA UNA ENTIDAD AL TRACKER
+            Policy policy = repository.GetPolicyById(_context, id);
+
+            if (policy is null) // No Existe el Id 
+            {
+                response.IsSuccess = false;
+                response.Message = ReplyMessage.MESSAGE_INSURANCE_ID_DOES_NOT_EXIST;
+
+                return response;
+            }
+
+            var firstPolicy = policies.FirstOrDefault(); 
+
+
+            if (firstPolicy is not null)
+            {
+                if (firstPolicy.PolicyId != policy.PolicyId) 
+                {
+                    response.IsSuccess = false;
+                    response.Message = ReplyMessage.MESSAGE_INSURANCE_CODE_ALREADY_ASSIGNED;
+
+                    return response;
+                }
+
+                policy = _mapper.Map<Policy>(requestDto);
+                policy.PolicyId = id;
+
+                _context.Update(policy);
+                var recordsAffected = _context.SaveChanges();
+
+                if (recordsAffected > 0)
+                {
+                    response.IsSuccess = true;
+                    response.Message = ReplyMessage.MESSAGE_SUCCESS;
+                    response.Data = recordsAffected > 0;
+                }
+                else
+                {
+                    response.IsSuccess = false;
+                    response.Message = ReplyMessage.MESSAGE_ERROR_TO_SAVE_IN_DB;
+                }
+            }
+            
+            return response;
+        }
+
+
+
         public BaseResponse<bool> RemovePolicy(int id) 
         { 
             var response = new BaseResponse<bool>();
-            var policy = new PolicyRepository();
+            var repository = new PolicyRepository();
 
-            var policyById = policy.GetPolicyById(_context, id);
+            var policy = repository.GetPolicyById(_context, id);
 
-            if (policyById is null)
+            if (policy is null)
             {
                 response.IsSuccess = false;
                 response.Message = ReplyMessage.MESSAGE_ERROR_TO_DELETE;
@@ -127,7 +150,7 @@ namespace InsuranceConsultingOffice.Application.Services
                 return response;
             }
 
-            _context.Remove(policyById);
+            _context.Remove(policy);
             var recordsAffected = _context.SaveChanges();
 
             if (recordsAffected > 0)

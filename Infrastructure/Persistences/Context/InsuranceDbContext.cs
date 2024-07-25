@@ -7,7 +7,7 @@ public partial class InsuranceDbContext : DbContext
 {
     public InsuranceDbContext(DbContextOptions<InsuranceDbContext> options) : base(options) { }
 
-    public virtual DbSet<Assignment> Assignments { get; set; }
+    public virtual DbSet<Assignament> Assignments { get; set; }
 
     public virtual DbSet<Insured> Insureds { get; set; }
 
@@ -19,15 +19,15 @@ public partial class InsuranceDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Assignment>(entity =>
+        modelBuilder.Entity<Assignament>(entity =>
         {
             entity.HasKey(e => e.AssignmentId).HasName("PK__Assignme__32499E7797346CDC");
 
-            entity.HasOne(d => d.Insured).WithMany(p => p.Assignments)
+            entity.HasOne(d => d.Insured).WithMany(p => p.Assignaments)
                 .HasForeignKey(d => d.InsuredId)
                 .HasConstraintName("FK__Assignmen__Insur__3D5E1FD2");
 
-            entity.HasOne(d => d.Policy).WithMany(p => p.Assignments)
+            entity.HasOne(d => d.Policy).WithMany(p => p.Assignaments)
                 .HasForeignKey(d => d.PolicyId)
                 .HasConstraintName("FK__Assignmen__Polic__3E52440B");
         });

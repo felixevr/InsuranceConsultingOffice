@@ -4,7 +4,7 @@ namespace InsuranceConsultingOffice.Application.Dtos.Response
 {
     public class PolicyResponseDto
     {
-        public string? PolicyId { get; set; }
+        public int PolicyId { get; set; }
 
         public string Name { get; set; } = null!;
 
@@ -14,6 +14,6 @@ namespace InsuranceConsultingOffice.Application.Dtos.Response
 
         public decimal Premium { get; set; }
 
-        public virtual ICollection<AssignamentResponseDto> Assignments { get; set; } = new List<AssignamentResponseDto>();
+        public virtual ICollection<InsuredAssignamentResponseDto> InsuredAssignaments { get; set; } = new List<InsuredAssignamentResponseDto>();
     }
 }

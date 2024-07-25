@@ -13,6 +13,7 @@ namespace InsuranceConsultingOffice.Application.Extensions
             services.AddFluentValidation(options => options.RegisterValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies().Where(p => !p.IsDynamic)));
             services.AddAutoMapper(Assembly.GetExecutingAssembly());
             services.AddScoped<IPolicyApplication, PolicyApplication>();
+            services.AddScoped<IInsuredsApplication, InsuredsApplication>();
 
             return services;
         }

@@ -9,7 +9,7 @@ namespace InsuranceConsultingOffice.Infrastructure.Persistences.Repositories
         public List<Policy> GetPoliciesByCode(InsuranceDbContext context, string code)
         {
             var response = context.Policies.Where(x => x.Code.Equals(code))
-                .Include(x => x.Assignments)
+                .Include(x => x.Assignaments)
                 .ThenInclude(x => x.Insured)
                 .ToList();
 

@@ -1,17 +1,18 @@
 ﻿using InsuranceConsultingOffice.Application.Dtos.Request;
 using InsuranceConsultingOffice.Application.Interfaces;
+using InsuranceConsultingOffice.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InsuranceConsultingOffice.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class PolicyController : ControllerBase
+    public class PoliciesController : ControllerBase
     {
 
         private readonly IPolicyApplication _policyApplication;
 
-        public PolicyController(IPolicyApplication policyApplication)
+        public PoliciesController(IPolicyApplication policyApplication)
         {
             _policyApplication = policyApplication; 
         }
@@ -19,9 +20,9 @@ namespace InsuranceConsultingOffice.Controllers
 
 
         [HttpGet("{code}")]
-        public /*async*/ IActionResult GetByCode([FromRoute] string code)
+        public IActionResult GetByCode([FromRoute] string code)
         {
-            var response = /*await*/ _policyApplication.GetPoliciesByCode(code);
+            var response = _policyApplication.GetPoliciesByCode(code);
 
             return Ok(response);
         }

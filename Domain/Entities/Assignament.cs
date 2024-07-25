@@ -1,6 +1,6 @@
 ﻿namespace InsuranceConsultingOffice.Domain.Entities;
 
-public partial class Assignment
+public partial class Assignament
 {
     public int AssignmentId { get; set; }
 

@@ -8,7 +8,8 @@ namespace InsuranceConsultingOffice.Application.Mappers
     {
         public AssignamentMapingsProfile()
         {
-            CreateMap<Assignment, AssignamentResponseDto>();
+            CreateMap<Assignament, InsuredAssignamentResponseDto>().ReverseMap();
+            CreateMap<Assignament, PolicyAssignamentResponseDto>().ReverseMap();
         }
     }
 }

@@ -9,7 +9,12 @@ namespace InsuranceConsultingOffice.Application.Mappers
     {
         public PolicyMapingsProfile() 
         {
-            CreateMap<Policy, PolicyResponseDto>().ReverseMap();
+            CreateMap<Policy, PolicyResponseDto>()
+                .ForMember(dest => dest.InsuredAssignaments, opt => opt.MapFrom(src => src.Assignaments))
+                .ReverseMap();
+
+            CreateMap<Policy, PolicyResponseOnlyDto>().ReverseMap();
+
             CreateMap<Policy, PolicyRequestDto>().ReverseMap();
         }
     }

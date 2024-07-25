@@ -13,5 +13,5 @@ public partial class Insured
     public int Age { get; set; }
 
     //[JsonIgnore]
-    public virtual ICollection<Assignment> Assignments { get; set; } = new List<Assignment>();
+    public virtual ICollection<Assignament> Assignaments { get; set; } = new List<Assignament>();
 }
