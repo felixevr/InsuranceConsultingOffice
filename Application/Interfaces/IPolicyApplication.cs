@@ -1,6 +1,7 @@
 ﻿using InsuranceConsultingOffice.Application.Bases;
 using InsuranceConsultingOffice.Application.Dtos.Request;
 using InsuranceConsultingOffice.Application.Dtos.Response;
+using InsuranceConsultingOffice.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace InsuranceConsultingOffice.Application.Interfaces

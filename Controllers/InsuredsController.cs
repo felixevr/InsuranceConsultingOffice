@@ -1,14 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using InsuranceConsultingOffice.Domain.Entities;
-using InsuranceConsultingOffice.Infrastructure.Repository.DBContext;
+﻿using InsuranceConsultingOffice.Application.Dtos.Request;
 using InsuranceConsultingOffice.Application.Interfaces;
-using InsuranceConsultingOffice.Application.Dtos.Request;
+using Microsoft.AspNetCore.Mvc;
 
 namespace InsuranceConsultingOffice.Controllers
 {

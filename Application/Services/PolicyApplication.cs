@@ -7,6 +7,7 @@ using InsuranceConsultingOffice.Domain.Entities;
 using InsuranceConsultingOffice.Infrastructure.Persistences.Repositories;
 using InsuranceConsultingOffice.Infrastructure.Repository.DBContext;
 using InsuranceConsultingOffice.Utilities;
+using Microsoft.EntityFrameworkCore;
 
 namespace InsuranceConsultingOffice.Application.Services
 {
@@ -26,14 +27,14 @@ namespace InsuranceConsultingOffice.Application.Services
         public BaseResponse<IEnumerable<PolicyResponseDto>> GetPoliciesByCode(string code)
         {
             var response = new BaseResponse<IEnumerable<PolicyResponseDto>>();
-            var repository = new PolicyRepository();
+            var repository = new PolicyRepository(_context);
 
-            IEnumerable<Policy> results = repository.GetPoliciesByCode(_context, code);
+            IEnumerable<Policy> policies = repository.GetPoliciesByCodeNoTrace(code);
 
-            if (results.Count() > 0)
+            if (policies.Any())
             {
                 response.IsSuccess = true;
-                response.Data = _mapper.Map<IEnumerable<PolicyResponseDto>>(results);
+                response.Data = _mapper.Map<IEnumerable<PolicyResponseDto>>(policies);
                 response.Message = ReplyMessage.MESSAGE_SUCCESS;
             }
             else
@@ -85,12 +86,12 @@ namespace InsuranceConsultingOffice.Application.Services
         public BaseResponse<bool> EditPolicy(int id, PolicyRequestDto requestDto) 
         {
             var response = new BaseResponse<bool>();
-            var repository = new PolicyRepository();
+            var repository = new PolicyRepository(_context);
 
-            IEnumerable<Policy> policies = repository.GetPoliciesByCode(_context, requestDto.Code!);  // ESTO AGREGA UNA ENTIDAD AL TRACKER
-            Policy policy = repository.GetPolicyById(_context, id);
+            IEnumerable<Policy> policies = repository.GetPoliciesByCodeNoTrace(requestDto.Code!);  
+            Policy policy = repository.GetPolicyById(id);
 
-            if (policy is null) // No Existe el Id 
+            if (policy is null) 
             {
                 response.IsSuccess = false;
                 response.Message = ReplyMessage.MESSAGE_INSURANCE_ID_DOES_NOT_EXIST;
@@ -98,36 +99,30 @@ namespace InsuranceConsultingOffice.Application.Services
                 return response;
             }
 
-            var firstPolicy = policies.FirstOrDefault(); 
-
-
-            if (firstPolicy is not null)
+            if (policies.Any(p => p.PolicyId != policy.PolicyId))
             {
-                if (firstPolicy.PolicyId != policy.PolicyId) 
-                {
-                    response.IsSuccess = false;
-                    response.Message = ReplyMessage.MESSAGE_INSURANCE_CODE_ALREADY_ASSIGNED;
+                response.IsSuccess = false;
+                response.Message = ReplyMessage.MESSAGE_INSURANCE_CODE_ALREADY_ASSIGNED;
+                
+                return response;
+            }
 
-                    return response;
-                }
+            policy = _mapper.Map<Policy>(requestDto);
+            policy.PolicyId = id;
 
-                policy = _mapper.Map<Policy>(requestDto);
-                policy.PolicyId = id;
+            _context.Update(policy);
+            var recordsAffected = _context.SaveChanges();
 
-                _context.Update(policy);
-                var recordsAffected = _context.SaveChanges();
-
-                if (recordsAffected > 0)
-                {
-                    response.IsSuccess = true;
-                    response.Message = ReplyMessage.MESSAGE_SUCCESS;
-                    response.Data = recordsAffected > 0;
-                }
-                else
-                {
-                    response.IsSuccess = false;
-                    response.Message = ReplyMessage.MESSAGE_ERROR_TO_SAVE_IN_DB;
-                }
+            if (recordsAffected > 0)
+            {
+                response.IsSuccess = true;
+                response.Message = ReplyMessage.MESSAGE_SUCCESS;
+                response.Data = recordsAffected > 0;
+            }
+            else
+            {
+                response.IsSuccess = false;
+                response.Message = ReplyMessage.MESSAGE_ERROR_TO_SAVE_IN_DB;
             }
             
             return response;
@@ -138,9 +133,9 @@ namespace InsuranceConsultingOffice.Application.Services
         public BaseResponse<bool> RemovePolicy(int id) 
         { 
             var response = new BaseResponse<bool>();
-            var repository = new PolicyRepository();
+            var repository = new PolicyRepository(_context);
 
-            var policy = repository.GetPolicyById(_context, id);
+            var policy = repository.GetPolicyById(id);
 
             if (policy is null)
             {

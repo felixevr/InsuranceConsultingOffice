@@ -6,22 +6,46 @@ namespace InsuranceConsultingOffice.Infrastructure.Persistences.Repositories
 {
     public class PolicyRepository
     {
-        public List<Policy> GetPoliciesByCode(InsuranceDbContext context, string code)
+        private readonly InsuranceDbContext _context;
+
+        public PolicyRepository(InsuranceDbContext context)
         {
-            var response = context.Policies.Where(x => x.Code.Equals(code))
+            _context = context;
+        }
+
+
+
+        public List<int> GetAllPoliciesIds()
+        {
+            List<int> policyIds = _context.Policies.AsNoTracking().Select(p => p.PolicyId).ToList();
+        
+            return policyIds;
+        }
+
+
+
+        public Policy GetPolicyById(int id)
+        {
+            var getByid = _context.Policies.AsNoTracking().FirstOrDefault(x => x.PolicyId.Equals(id));
+
+            return getByid!;
+        }
+
+
+
+        public List<Policy> GetPoliciesByCodeNoTrace(string code)
+        {
+            var response = _context.Policies.AsNoTracking().Where(x => x.Code.Equals(code))
                 .Include(x => x.Assignaments)
                 .ThenInclude(x => x.Insured)
                 .ToList();
 
             return response;
         }
+    }
+}
 
-        public Policy GetPolicyById(InsuranceDbContext context, int id)
-        {
-            var getByid = context.Policies.AsNoTracking().FirstOrDefault(x => x.PolicyId.Equals(id));
 
-            return getByid!;
-        }
 
         // ====================================================================================
 
@@ -34,5 +58,3 @@ namespace InsuranceConsultingOffice.Infrastructure.Persistences.Repositories
 
         //    return getByid;
         //}
-    }
-}

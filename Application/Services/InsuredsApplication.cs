@@ -7,7 +7,6 @@ using InsuranceConsultingOffice.Domain.Entities;
 using InsuranceConsultingOffice.Infrastructure.Persistences.Repositories;
 using InsuranceConsultingOffice.Infrastructure.Repository.DBContext;
 using InsuranceConsultingOffice.Utilities;
-using NuGet.Protocol.Core.Types;
 
 namespace InsuranceConsultingOffice.Application.Services
 {
@@ -27,9 +26,9 @@ namespace InsuranceConsultingOffice.Application.Services
         public BaseResponse<IEnumerable<InsuredResponseDto>> GetInsuredsByCardId(string cardId)
         {
             var response = new BaseResponse<IEnumerable<InsuredResponseDto>>();
-            var repository = new InsuredRepository();
+            var repository = new InsuredRepository(_context);
 
-            IEnumerable<Insured> insureds = repository.GetInsuredsByCardId(_context, cardId);
+            IEnumerable<Insured> insureds = repository.GetInsuredsByCardIdNoTrace(cardId);
 
             if (insureds.Any())
             {
@@ -56,7 +55,7 @@ namespace InsuranceConsultingOffice.Application.Services
             if (cardIdValidation.Data is not null)
             {
                 response.IsSuccess = false;
-                response.Message = ReplyMessage.MESSAGE_CLIENT_ALREADY_EXIST;
+                response.Message = string.Format(ReplyMessage.MESSAGE_CLIENT_ALREADY_EXIST, requestDto.IdCard); 
 
                 return response;
             }
@@ -84,24 +83,23 @@ namespace InsuranceConsultingOffice.Application.Services
         public BaseResponse<bool> EditInsured(InsuredRequestDto requestDto, int id)
         {
             var response = new BaseResponse<bool>();
-            var repository = new InsuredRepository();
+            var repository = new InsuredRepository(_context);
 
-            IEnumerable<Insured> insureds = repository.GetInsuredsByCardId(_context, requestDto.IdCard);
+            IEnumerable<Insured> insureds = repository.GetInsuredsByCardIdNoTrace(requestDto.IdCard);
+            Insured insured = repository.GetInsuredById(id);
 
-            if (insureds.Any())
+            if (insured is null)
             {
                 response.IsSuccess = false;
-                response.Message = ReplyMessage.MESSAGE_IDCARD_NUMBER_ALREADY_ASSIGNED;
+                response.Message = ReplyMessage.MESSAGE_CLIENT_ID_DOES_NOT_EXIST;
 
                 return response;
             }
 
-            Insured insured = repository.GetInsuredById(_context, id);
-
-            if (insured is null || insureds.First().IdCard != requestDto.IdCard)
+            if (insureds.Any(i => i.InsuredId != insured.InsuredId))
             {
                 response.IsSuccess = false;
-                response.Message = ReplyMessage.MESSAGE_CLIENT_ID_DOES_NOT_EXIST;
+                response.Message = ReplyMessage.MESSAGE_IDCARD_NUMBER_ALREADY_ASSIGNED;
 
                 return response;
             }
@@ -132,9 +130,9 @@ namespace InsuranceConsultingOffice.Application.Services
         public BaseResponse<bool> RemoveInsured(int id)
         {
             var response = new BaseResponse<bool>();
-            var repository = new InsuredRepository();
+            var repository = new InsuredRepository(_context);
 
-            var insured = repository.GetInsuredById(_context, id);
+            var insured = repository.GetInsuredById(id);
 
             if (insured is null)
             {

@@ -6,22 +6,41 @@ namespace InsuranceConsultingOffice.Infrastructure.Persistences.Repositories
 {
     public class InsuredRepository
     {
-        
-        public List<Insured> GetInsuredsByCardId(InsuranceDbContext context, string cardId)
+        private readonly InsuranceDbContext _context;
+        public InsuredRepository(InsuranceDbContext context)
         {
-            var response = context.Insureds.Where(x => x.IdCard.Equals(cardId))
+            _context = context;
+        }
+
+        //public List<Insured> GetInsuredsByCardId(string cardId)
+        //{
+        //    var response = _context.Insureds.Where(x => x.IdCard.Equals(cardId))
+        //        .Include(x => x.Assignaments)
+        //        .ThenInclude(x => x.Policy)
+        //        .ToList();
+
+        //    return response;
+        //}
+
+
+
+        public Insured GetInsuredById(int id)
+        {
+            var getById = _context.Insureds.AsNoTracking().FirstOrDefault(x => x.InsuredId.Equals(id));
+
+            return getById!;
+        }
+
+
+
+        public List<Insured> GetInsuredsByCardIdNoTrace(string cardId)
+        {
+            var response = _context.Insureds.AsNoTracking().Where(x => x.IdCard.Equals(cardId))
                 .Include(x => x.Assignaments)
                 .ThenInclude(x => x.Policy)
                 .ToList();
 
             return response;
-        }
-
-        public Insured GetInsuredById(InsuranceDbContext context, int id)
-        {
-            var getById = context.Insureds.AsNoTracking().FirstOrDefault();
-
-            return getById!;
         }
     }
 }
